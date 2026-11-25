@@ -1,0 +1,51 @@
+name: Descargar BOE oficial
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/descargar-boe.yml'
+      - 'scripts/descargar_boe.py'
+  schedule:
+    - cron: '40,52 7 * * *'
+      timezone: 'Europe/Madrid'
+  workflow_dispatch:
+    inputs:
+      fecha:
+        description: 'Fecha a recuperar (AAAA-MM-DD); vacío = hoy'
+        required: false
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: descargar-boe
+  cancel-in-progress: false
+jobs:
+  descargar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Consultar el BOE oficial
+        env:
+          FECHA: ${{ inputs.fecha }}
+        run: |
+          set -euo pipefail
+          if [ -n "$FECHA" ]; then
+            python3 scripts/descargar_boe.py --fecha "$FECHA"
+          else
+            python3 scripts/descargar_boe.py
+          fi
+      - name: Guardar fuentes y estado de la descarga
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add fuentes-boe/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Fuentes oficiales del BOE"
+          for intento in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 5
+          done
+          exit 1
