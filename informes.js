@@ -7,9 +7,9 @@ window.INFORMES = [
       "politicaTerritorial": null,
       "otros": null,
       "total": null,
-      "destacados": "Segunda revisión solicitada a las 08:59 h (hora peninsular). La edición del día 25 no ha podido recuperarse mediante los medios de consulta disponibles. El calendario recuperado corresponde todavía al día 24, n.º 292.",
-      "alerta": "No es posible confirmar novedades ni plazos del día 25. La falta de acceso no significa que el BOE no esté publicado.",
-      "nota": "Se han intentado rutas directas HTML, API, XML, PDF, RSS, calendario y acceso alternativo a la sede oficial. Los resultados recuperados están desactualizados o no permiten leer el documento. Continúa pendiente la revisión del día 25 y la comprobación íntegra de la edición anterior."
+      "destacados": "Nueva comprobación del 25/11/2026: no se ha podido recuperar el sumario de esta fecha. Los índices consultados siguen mostrando la edición del 24 de noviembre, n.º 292.",
+      "alerta": "Incidencia de acceso a la fuente: no se pueden confirmar publicaciones ni plazos. No equivale a ausencia de edición.",
+      "nota": "Se han consultado las rutas HTML y API con y sin www, variantes de fecha, PDF y XML del sumario, RSS e índices alternativos. Los accesos directos fallaron y las búsquedas recuperaron principalmente el día 24. Un índice alternativo mostró una mención del 25 que no permitió recuperar ni verificar el sumario. Recuentos pendientes; no se incorporan documentos de ayer como novedades de hoy."
     },
     "texto": "[Consultar sumario oficial del 25 de noviembre](https://www.boe.es/boe/dias/2026/11/25/)\n[Consultar API oficial del sumario](https://www.boe.es/datosabiertos/api/boe/sumario/20261125)\n\n## A. Publicaciones relativas a Melilla\nPendientes de comprobación.\n\n## B. Ministerio de Política Territorial y Memoria Democrática\nPendientes de comprobación.\n\n## C. Otras publicaciones de interés para la Delegación\nPendientes de comprobación."
   },
