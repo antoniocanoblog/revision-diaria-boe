@@ -7,11 +7,11 @@ window.INFORMES = [
       "politicaTerritorial": null,
       "otros": null,
       "total": null,
-      "destacados": "Edición del 25 de noviembre pendiente de comprobación. El calendario oficial consultado identifica como última edición la del 24 de noviembre, n.º 292.",
-      "alerta": "No se pueden determinar novedades ni plazos de la edición de hoy.",
-      "nota": "Consulta de las 08:00 h: sumario HTML, API, XML y PDF del día no accesibles. No equivale a ausencia de publicaciones. Queda pendiente asimismo completar la revisión de textos íntegros y suplementos del día 24."
+      "destacados": "Segunda revisión solicitada a las 08:59 h (hora peninsular). La edición del día 25 no ha podido recuperarse mediante los medios de consulta disponibles. El calendario recuperado corresponde todavía al día 24, n.º 292.",
+      "alerta": "No es posible confirmar novedades ni plazos del día 25. La falta de acceso no significa que el BOE no esté publicado.",
+      "nota": "Se han intentado rutas directas HTML, API, XML, PDF, RSS, calendario y acceso alternativo a la sede oficial. Los resultados recuperados están desactualizados o no permiten leer el documento. Continúa pendiente la revisión del día 25 y la comprobación íntegra de la edición anterior."
     },
-    "texto": "[Consultar calendario oficial del BOE](https://www.boe.es/diario_boe/)\n\n[Consultar sumario del 25 de noviembre cuando esté disponible](https://www.boe.es/boe/dias/2026/11/25/)\n\n## A. Publicaciones relativas a Melilla\nPendientes de comprobación.\n\n## B. Ministerio de Política Territorial y Memoria Democrática\nPendientes de comprobación.\n\n## C. Otras publicaciones de interés para la Delegación\nPendientes de comprobación."
+    "texto": "[Consultar sumario oficial del 25 de noviembre](https://www.boe.es/boe/dias/2026/11/25/)\n[Consultar API oficial del sumario](https://www.boe.es/datosabiertos/api/boe/sumario/20261125)\n\n## A. Publicaciones relativas a Melilla\nPendientes de comprobación.\n\n## B. Ministerio de Política Territorial y Memoria Democrática\nPendientes de comprobación.\n\n## C. Otras publicaciones de interés para la Delegación\nPendientes de comprobación."
   },
   {
     "fecha": "2026-11-24",
