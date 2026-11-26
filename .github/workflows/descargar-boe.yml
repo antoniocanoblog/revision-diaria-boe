@@ -6,8 +6,8 @@ on:
       - '.github/workflows/descargar-boe.yml'
       - 'scripts/descargar_boe.py'
   schedule:
-    - cron: '40,52 7 * * *'
-      timezone: 'Europe/Madrid'
+    # UTC: cubre las 07:37-08:57 peninsulares tanto en invierno como en verano.
+    - cron: '37,47,57 5,6,7 * * *'
   workflow_dispatch:
     inputs:
       fecha:
@@ -25,7 +25,38 @@ jobs:
     timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
+      - name: Comprobar ventana horaria y descarga previa
+        id: control
+        env:
+          EVENTO: ${{ github.event_name }}
+          FECHA: ${{ inputs.fecha }}
+        run: |
+          python3 - <<'PY'
+          import datetime, json, os, pathlib
+          from zoneinfo import ZoneInfo
+          now = datetime.datetime.now(ZoneInfo("Europe/Madrid"))
+          date = os.environ.get("FECHA") or now.date().isoformat()
+          scheduled = os.environ["EVENTO"] == "schedule"
+          inside = 7*60+30 <= now.hour*60+now.minute < 9*60
+          complete = False
+          p = pathlib.Path("fuentes-boe") / date / "estado.json"
+          try:
+              meta = json.loads(p.read_text(encoding="utf-8"))
+              complete = (meta.get("fecha") == date and
+                          meta.get("estado") == "textos_comprobados" and
+                          isinstance(meta.get("total"), int) and meta["total"] > 0 and
+                          meta.get("textos_verificados") == meta["total"] and
+                          bool(meta.get("indices")) and
+                          all(pathlib.Path(f).is_file() for f in meta["indices"]))
+          except (OSError, ValueError, TypeError):
+              pass
+          proceed = not scheduled or (inside and not complete)
+          print(f"Hora local: {now.isoformat()}; edición: {date}; completa: {complete}; descargar: {proceed}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("proceder=" + str(proceed).lower() + "\n")
+          PY
       - name: Consultar el BOE oficial
+        if: steps.control.outputs.proceder == 'true'
         env:
           FECHA: ${{ inputs.fecha }}
         run: |
@@ -36,6 +67,7 @@ jobs:
             python3 scripts/descargar_boe.py
           fi
       - name: Guardar fuentes y estado de la descarga
+        if: steps.control.outputs.proceder == 'true'
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
