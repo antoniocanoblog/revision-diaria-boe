@@ -6,8 +6,9 @@ on:
       - '.github/workflows/descargar-boe.yml'
       - 'scripts/descargar_boe.py'
   schedule:
-    # UTC: cubre las 07:37-08:57 peninsulares tanto en invierno como en verano.
-    - cron: '37,47,57 5,6,7 * * *'
+    # UTC; se filtra la ventana peninsular para ambos horarios estacionales.
+    - cron: '40,45,50,55 5,6 * * *'
+    - cron: '0 6,7 * * *'
   workflow_dispatch:
     inputs:
       fecha:
@@ -37,7 +38,7 @@ jobs:
           now = datetime.datetime.now(ZoneInfo("Europe/Madrid"))
           date = os.environ.get("FECHA") or now.date().isoformat()
           scheduled = os.environ["EVENTO"] == "schedule"
-          inside = 7*60+30 <= now.hour*60+now.minute < 9*60
+          inside = 7*60+40 <= now.hour*60+now.minute <= 8*60
           complete = False
           p = pathlib.Path("fuentes-boe") / date / "estado.json"
           try:
