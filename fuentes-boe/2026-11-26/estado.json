@@ -3,7 +3,7 @@
   "fuente_api": "https://www.boe.es/datosabiertos/api/boe/sumario/20261126",
   "fuente_html": "https://www.boe.es/boe/dias/2026/11/26/",
   "estado": "textos_comprobados",
-  "consulta": "2026-11-26T09:13:17.306398+01:00",
+  "consulta": "2026-11-26T09:15:30.110050+01:00",
   "alcance": "Sumario API; suplementos que figuren en ella. TEU y TEJU independientes no cubiertos.",
   "total": 285,
   "boletines": [
