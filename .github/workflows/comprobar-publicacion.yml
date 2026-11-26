@@ -1,0 +1,69 @@
+name: Comprobar publicación del informe BOE
+on:
+  schedule:
+    - cron: '*/5 6,7 * * *'
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+concurrency:
+  group: comprobar-publicacion-boe
+  cancel-in-progress: false
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comprobar informe y publicación
+        env:
+          EVENTO: ${{ github.event_name }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import datetime, json, os, pathlib, re, time, urllib.request, urllib.error
+          from zoneinfo import ZoneInfo
+          now = datetime.datetime.now(ZoneInfo("Europe/Madrid"))
+          minute = now.hour * 60 + now.minute
+          if os.environ["EVENTO"] == "schedule" and not 480 <= minute <= 540:
+              print("Fuera del horario de comprobación (08:00–09:00).")
+              raise SystemExit(0)
+          date = now.date().isoformat()
+          def parse(raw):
+              match = re.fullmatch(r"\s*window\.INFORMES\s*=\s*(\[[\s\S]*\])\s*;?\s*", raw)
+              if not match:
+                  raise ValueError("Formato de informes inválido")
+              return next((r for r in json.loads(match.group(1)) if r.get("fecha") == date), None)
+          def get(url):
+              req = urllib.request.Request(url+"?v="+str(time.time_ns()),headers={"Cache-Control":"no-cache","User-Agent":"BOE-publication-check"})
+              with urllib.request.urlopen(req,timeout=12) as res:
+                  return res.read().decode("utf-8")
+          expected = parse(pathlib.Path("informes.js").read_text(encoding="utf-8"))
+          if not expected or not isinstance(expected.get("resumen",{}).get("total"), int):
+              print("Todavía no hay un informe con recuento para hoy. No se fabrica un informe ni se solicita un despliegue vacío.")
+              raise SystemExit(0)
+          base="https://antoniocanoblog.github.io/revision-diaria-boe/"
+          direct="https://raw.githubusercontent.com/antoniocanoblog/revision-diaria-boe/main/informes.js"
+          try:
+              html=get(base)
+              if direct in html and "refreshReports" in html:
+                  if parse(get(direct)) == expected:
+                      print("Informe de hoy accesible desde el origen directo de la página. No se solicita otro despliegue.")
+                      raise SystemExit(0)
+              if parse(get(base+"informes.js")) == expected:
+                  print("Copia publicada del informe de hoy coincide. No se solicita otro despliegue.")
+                  raise SystemExit(0)
+          except (OSError, ValueError, TypeError) as exc:
+              print("Comprobación pública no concluyente:",exc)
+          # Solo se solicita una nueva compilación si existe un informe real
+          # y no se ha podido comprobar su disponibilidad en los orígenes públicos.
+          endpoint="https://api.github.com/repos/"+os.environ["GITHUB_REPOSITORY"]+"/pages/builds"
+          req=urllib.request.Request(endpoint,data=b"",method="POST",headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"BOE-publication-check"})
+          try:
+              with urllib.request.urlopen(req,timeout=15) as res:
+                  print("Solicitud de compilación de Pages:",res.status,". No equivale a despliegue confirmado.")
+          except urllib.error.HTTPError as exc:
+              print("GitHub no permite solicitar la compilación con los permisos actuales:",exc.code)
+              raise SystemExit(1)
+          PY
